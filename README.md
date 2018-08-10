@@ -24,3 +24,10 @@ Setting in config.yaml
          # Setting the file of output report csv file at here
          filepath: deadlock_report.csv
 ```
+### Deadlock report information
+
+- 1. The date of deadlock occured
+- 2. The datetime of deadlock occured
+- 3. Deadlock trigged table
+- 4. XDL filename
+- 5. Victim SQL
