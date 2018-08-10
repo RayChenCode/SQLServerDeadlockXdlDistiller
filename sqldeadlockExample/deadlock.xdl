@@ -1,0 +1,68 @@
+<deadlock-list>
+	<deadlock victim="process14ca60cf8">
+		<process-list>
+			<process id="process14ca60cf8" taskpriority="0" logused="216" waitresource="RID: 35:1:89:0" waittime="4072" ownerId="42093518" transactionname="Tran_two" lasttranstarted="2018-01-23T11:25:37.473" XDES="0x15f6b8d28" lockMode="U" schedulerid="2" kpid="3500" status="suspended" spid="69" sbid="0" ecid="0" priority="0" trancount="2" lastbatchstarted="2018-01-23T11:25:37.473" lastbatchcompleted="2018-01-23T10:41:34.023" lastattention="1900-01-01T00:00:00.023" clientapp="Navicat Premium" hostname="PC0625" hostpid="9592" loginname="sa" isolationlevel="read committed (2)" xactid="42093518" currentdb="35" lockTimeout="4294967295" clientoption1="671088672" clientoption2="128056">
+				<executionStack>
+					<frame procname="adhoc" line="8" stmtstart="36" sqlhandle="0x02000000645ca82bbcc63c6d66ee8f6a9a3bca4cff97a6790000000000000000000000000000000000000000">
+UPDATE [t1] set [c2] = @1     </frame>
+					<frame procname="adhoc" line="8" stmtstart="178" stmtend="244" sqlhandle="0x020000005cffe818106b700f9cecb05570047a838d4de3220000000000000000000000000000000000000000">
+UPDATE t1
+    set c2 = 'lock'     </frame>
+				</executionStack>
+				<inputbuf>
+BEGIN Tran Tran_two
+
+UPDATE t2 
+    set c3 = 'lock'
+
+WAITFOR DELAY '00:00:15';  
+
+UPDATE t1
+    set c2 = 'lock'
+
+ROLLBACK
+    </inputbuf>
+			</process>
+			<process id="process1681b2188" taskpriority="0" logused="220" waitresource="RID: 35:1:93:0" waittime="5958" ownerId="42093517" transactionname="Tran_one" lasttranstarted="2018-01-23T11:25:35.587" XDES="0x146ec76a8" lockMode="U" schedulerid="4" kpid="7840" status="suspended" spid="64" sbid="0" ecid="0" priority="0" trancount="2" lastbatchstarted="2018-01-23T11:25:35.587" lastbatchcompleted="2018-01-23T10:41:34.023" lastattention="1900-01-01T00:00:00.023" clientapp="Navicat Premium" hostname="PC0625" hostpid="9592" loginname="sa" isolationlevel="read committed (2)" xactid="42093517" currentdb="35" lockTimeout="4294967295" clientoption1="671088672" clientoption2="128056">
+				<executionStack>
+					<frame procname="adhoc" line="7" stmtstart="36" sqlhandle="0x020000004373d528c4ffd6faf60cc17a03696237e31ac90b0000000000000000000000000000000000000000">
+UPDATE [t2] set [c3] = @1     </frame>
+					<frame procname="adhoc" line="7" stmtstart="174" stmtend="242" sqlhandle="0x02000000618e4b08651b016eff40087dcdc3fee199faf9d60000000000000000000000000000000000000000">
+UPDATE t2 
+    set c3 = 'lock'     </frame>
+				</executionStack>
+				<inputbuf>
+BEGIN Tran Tran_one
+UPDATE t1 
+    set c2 = 'lock'
+
+WAITFOR DELAY '00:00:15';  
+
+UPDATE t2 
+    set c3 = 'lock'
+
+ROLLBACK
+
+    </inputbuf>
+			</process>
+		</process-list>
+		<resource-list>
+			<ridlock fileid="1" pageid="89" dbid="35" objectname="DeadLockDb.dbo.t1" id="lock155c54800" mode="X" associatedObjectId="72057594039042048">
+				<owner-list>
+					<owner id="process1681b2188" mode="X"/>
+				</owner-list>
+				<waiter-list>
+					<waiter id="process14ca60cf8" mode="U" requestType="wait"/>
+				</waiter-list>
+			</ridlock>
+			<ridlock fileid="1" pageid="93" dbid="35" objectname="DeadLockDb.dbo.t2" id="lock16e08a300" mode="X" associatedObjectId="72057594039107584">
+				<owner-list>
+					<owner id="process14ca60cf8" mode="X"/>
+				</owner-list>
+				<waiter-list>
+					<waiter id="process1681b2188" mode="U" requestType="wait"/>
+				</waiter-list>
+			</ridlock>
+		</resource-list>
+	</deadlock>
+</deadlock-list>

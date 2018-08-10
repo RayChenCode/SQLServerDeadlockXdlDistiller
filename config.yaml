@@ -1,0 +1,5 @@
+deadlock:
+    directory:
+        path: C:\\Users\\ray.chen\\Desktop\\sqldeadlock20180802
+    report:
+        filepath: deadlock_report.csv
