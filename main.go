@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
-	"golang.org/x/text/encoding/unicode"
+	//"golang.org/x/text/encoding/unicode"
 	"regexp"
 	"github.com/spf13/viper"
 	"bufio"
+	//"bytes"
 )
 
 func panicWhenErr(err error) {
@@ -18,9 +19,9 @@ func panicWhenErr(err error) {
 	}
 }
 
-func findVictimSql(dat []byte) (result string) {
-	content := strings.Replace(string(dat), "\n", "", -1)
-	content = strings.Replace(content, "\r", "", -1)
+func findVictimSql(input string) (result string) {
+	r := strings.NewReplacer("\n", "", "\r", "")
+	content := r.Replace(input)
 	idRule := `deadlock victim="([a-z0-9]+)"`
 	re := regexp.MustCompile(idRule)
 	processId := re.FindStringSubmatch(content)
@@ -69,21 +70,22 @@ func main() {
 		}
 		dat, err := ioutil.ReadFile(file)
 		panicWhenErr(err)
-		dat, err = unicode.UTF16(true, 0).NewDecoder().Bytes(dat)
+		//dat, err = unicode.UTF8.NewDecoder().Bytes(dat)
+		content := string(dat)
 		re := regexp.MustCompile(rule)
-		tableName := re.FindStringSubmatch(string(dat))
+		tableName := re.FindStringSubmatch(content)
 
 		info, err := os.Stat(file)
 		panicWhenErr(err)
 		date := info.ModTime().Format("2006-01-02")
 		dateTime := info.ModTime().Format("2006-01-02 15:04")
-		sql := findVictimSql(dat)
+		sql := findVictimSql(content)
 		if sql == "" {
 			fmt.Print("**")
 		}
 
 		_, err = fmt.Fprintf(
-			w, "%q,%q,%q,%q,%q\n", date, dateTime, tableName[1], info.Name(), strings.Replace(sql, "&apos;","'", -1))
+			w, "%q,%q,%q,%q,%q\n", date, dateTime, tableName, info.Name(), strings.Replace(sql, "&apos;","'", -1))
 		progress := float32(i + 1) / float32(len(files))
 		fmt.Printf("\r Processing: %d/%d [%s%s]", i+1, len(files), strings.Repeat(">", int(progress*50)), strings.Repeat("*", 50-int(progress*50)))
 	}
